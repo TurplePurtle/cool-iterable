@@ -1,5 +1,5 @@
 import { assertEquals } from "https://deno.land/std@0.166.0/testing/asserts.ts";
-import * as cool from "./cool-iterable.ts";
+import * as cool from "./mod.ts";
 
 function assertIterableEquals(a: Iterable<unknown>, b: Iterable<unknown>) {
   const iterA = a[Symbol.iterator]();

@@ -4,7 +4,7 @@ import * as cool from "./mod.ts";
 function assertIterableEquals(a: Iterable<unknown>, b: Iterable<unknown>) {
   const iterA = a[Symbol.iterator]();
   const iterB = b[Symbol.iterator]();
-  for (let i = 0;; i++) {
+  for (let i = 0; ; i++) {
     const itemA = iterA.next();
     const itemB = iterB.next();
     itemA.done = !!itemA.done;
@@ -55,7 +55,7 @@ Deno.test("combine", () => {
   const it = cool.combine(
     (key, value) => `${key}: ${value}`,
     ["a", "b", "c"],
-    [1, 2],
+    [1, 2]
   );
   assertIterableEquals(it, ["a: 1", "b: 2"]);
 });
@@ -73,4 +73,24 @@ Deno.test("take", () => {
 Deno.test("join", () => {
   const it = cool.from([1, 2, 3]).join(0);
   assertIterableEquals(it, [1, 0, 2, 0, 3]);
+});
+
+Deno.test("permute", () => {
+  const it = cool.permute((a, b, c) => `${a}${b}${c}`, [1, 2], [3], [4, 5]);
+  assertIterableEquals(it, ["134", "135", "234", "235"]);
+});
+
+Deno.test("permute single 1", () => {
+  const it = cool.permute((a) => `${a}`, [1, 2, 3]);
+  assertIterableEquals(it, ["1", "2", "3"]);
+});
+
+Deno.test("permute single 2", () => {
+  const it = cool.permute((a, b, c) => `${a}${b}${c}`, [1], [2], [3]);
+  assertIterableEquals(it, ["123"]);
+});
+
+Deno.test("permute with empty", () => {
+  const it = cool.permute((a, b, c) => `${a}${b}${c}`, [1], [], [3]);
+  assertIterableEquals([...it], []);
 });

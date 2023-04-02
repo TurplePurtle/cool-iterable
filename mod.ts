@@ -177,3 +177,57 @@ class TakeIterable<T> extends CoolIterable<T> {
     }
   }
 }
+
+export function permute<T extends Tuple, R>(
+  f: (...args: [...T]) => R,
+  ...its: MapToIterable<T>
+) {
+  return new PermuteIterable(f, its);
+}
+
+class PermuteIterable<T extends Tuple, R> extends CoolIterable<R> {
+  constructor(
+    private f: (...args: [...T]) => R,
+    private its: MapToIterable<T>
+  ) {
+    super();
+  }
+  *[Symbol.iterator]() {
+    const len = this.its.length;
+    const iterators = this.its.map(iteratorOf);
+    const done: boolean[] = [];
+    const values: [...T] = [] as unknown as [...T];
+
+    // Initialize first value
+    for (let i = 0; i < len; i++) {
+      const next = iterators[i].next();
+      // One of the iterables was empty so there's nothing to do.
+      if (next.done) return [];
+      done[i] = false;
+      values[i] = next.value;
+    }
+
+    yield this.f.apply(null, values);
+
+    while (true) {
+      const next = iterators[len - 1].next();
+      done[len - 1] = next.done === true;
+      values[len - 1] = next.value;
+      for (let i = len - 1; done[i]; i--) {
+        if (i === 0) return;
+        iterators[i] = iteratorOf(this.its[i]);
+        {
+          const next = iterators[i].next();
+          done[i] = next.done === true;
+          values[i] = next.value;
+        }
+        {
+          const next = iterators[i - 1].next();
+          done[i - 1] = next.done === true;
+          values[i - 1] = next.value;
+        }
+      }
+      yield this.f.apply(null, values);
+    }
+  }
+}

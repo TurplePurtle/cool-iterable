@@ -98,6 +98,23 @@ class GenerateIterable extends CoolIterable<number> {
   }
 }
 
+export function range(start: number, end: number, step = 1) {
+  return new RangeIterable(start, end, step);
+}
+
+class RangeIterable extends CoolIterable<number> {
+  constructor(
+    readonly start: number,
+    readonly end: number,
+    readonly step: number,
+  ) {
+    super();
+  }
+  *[Symbol.iterator]() {
+    for (let i = this.start; i < this.end; i += this.step) yield i;
+  }
+}
+
 class MapIterable<T, R> extends CoolIterable<R> {
   constructor(private it: Iterable<T>, private f: (x: T) => R) {
     super();
@@ -137,7 +154,7 @@ class ZipIterable<T> extends CoolIterable<T> {
 class CombineIterable<T extends Tuple, R> extends CoolIterable<R> {
   constructor(
     private f: (...args: [...T]) => R,
-    private its: MapToIterable<T>
+    private its: MapToIterable<T>,
   ) {
     super();
   }
@@ -188,7 +205,7 @@ export function permute<T extends Tuple, R>(
 class PermuteIterable<T extends Tuple, R> extends CoolIterable<R> {
   constructor(
     private f: (...args: [...T]) => R,
-    private its: MapToIterable<T>
+    private its: MapToIterable<T>,
   ) {
     super();
   }

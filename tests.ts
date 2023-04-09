@@ -36,6 +36,14 @@ Deno.test("generate", () => {
   assertIterableEquals(it, [0, 1, 2]);
 });
 
+Deno.test("range", () => {
+  assertIterableEquals(cool.range(2, 5), [2, 3, 4]);
+  assertIterableEquals(cool.range(2, 5, 2), [2, 4]);
+  assertIterableEquals(cool.range(2, 6, 2), [2, 4]);
+  assertIterableEquals(cool.range(2, 2), []);
+  assertIterableEquals(cool.range(2, 1), []);
+});
+
 Deno.test("map", () => {
   const it = cool.from([1, 2, 3]).map((x) => x * x);
   assertIterableEquals(it, [1, 4, 9]);
@@ -55,7 +63,7 @@ Deno.test("combine", () => {
   const it = cool.combine(
     (key, value) => `${key}: ${value}`,
     ["a", "b", "c"],
-    [1, 2]
+    [1, 2],
   );
   assertIterableEquals(it, ["a: 1", "b: 2"]);
 });
